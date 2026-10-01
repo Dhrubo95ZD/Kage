@@ -1,0 +1,21 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.kage.shadowfall'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'com.kage.shadowfall'
+        minSdk 26
+        targetSdk 35
+        versionCode 36
+        versionName '0.22.2'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.test'; versionNameSuffix '-test' }
+        release { minifyEnabled false }
+    }
+}
+dependencies { implementation 'androidx.browser:browser:1.8.0' }

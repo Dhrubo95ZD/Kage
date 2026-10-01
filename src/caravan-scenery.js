@@ -1,0 +1,24 @@
+import * as T from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+export function buildCaravanScenery(scene){const batches=new Map(),o=new T.Object3D(),animated=[];const add=(g,c,x,y,z,sx=1,sy=1,sz=1,ry=0)=>{if(g.index){const old=g;g=g.toNonIndexed();old.dispose();}o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.rotation.set(0,ry,0);o.updateMatrix();g.applyMatrix4(o.matrix);if(!batches.has(c))batches.set(c,[]);batches.get(c).push(g);};const box=(c,x,y,z,w,h,d)=>add(new T.BoxGeometry(w,h,d),c,x,y,z);const stone=(c,x,y,z,r,sx=1,sy=1,sz=1)=>add(new T.IcosahedronGeometry(r,0),c,x,y,z,sx,sy,sz);const wood='#8d6546',brass='#d0ac6c';
+ // Caravanserai: courtyards, striped awnings, loaded carts, pottery, wells and shade trees.
+ for(const [x,z,c] of [[48,5,'#8caaa6'],[50,11,'#bb7453'],[54,5,'#c0a15a'],[45,9,'#69888b']]){box(wood,x,.75,z,1.8,.14,.8);for(const dx of [-.85,.85])for(const dz of [-.5,.5])box(wood,x+dx,1.15,z+dz,.07,2.3,.07);for(let i=0;i<7;i++)box(i%2?c:'#f1dfb4',x-.9+i*.3,2.35,z,.3,.08,1.5);for(let i=0;i<9;i++)stone(i%2?'#d09c55':'#a07750',x-.7+(i%3)*.65,.99,z-.25+Math.floor(i/3)*.25,.14);}
+ for(const [x,z] of [[48,12],[56,10],[67,5],[69,4]]){box(wood,x,.6,z,1.2,.2,2.3);box('#c4aa7b',x,1.1,z,1.1,.8,1.8);for(const side of [-1,1])for(const end of [-1,1])add(new T.TorusGeometry(.33,.09,5,12),wood,x+side*.67,.4,z+end*.75,1,1,1,Math.PI/2);for(let i=0;i<3;i++)box('#aa815b',x,1.65,z-.65+i*.65,.9,.32,.5);}
+ add(new T.CylinderGeometry(.8,.85,.8,12), '#9b9d87',51,.4,6.7);add(new T.CylinderGeometry(.58,.58,.03,12),'#56858d',51,.82,6.7);for(const dx of [-.9,.9])box(wood,51+dx,1.65,6.7,.12,2.2,.12);box(wood,51,2.8,6.7,2.1,.14,.14);
+ for(let i=0;i<9;i++){const x=44+i*1.1;box('#c7b089',x,.45,13.5,1,.9,.35);box(brass,x,.92,13.5,1.05,.07,.4);}for(let i=0;i<7;i++){const x=60+i*.65;for(let row=0;row<4;row++){box('#af9b6c',x,.10,9+row*.6,.55,.20,.5);add(new T.ConeGeometry(.14,.65,5),'#8eae66',x,.48,9+row*.6);}}
+ // Glassroot: outcrops, survey ribbons and a blue reflective pool between roots.
+ for(let i=0;i<48;i++){const a=i*2.399,r=3+(i%6)*.8,x=69+Math.cos(a)*r,z=-17+Math.sin(a)*r;add(new T.ConeGeometry(.2+(i%3)*.08,1+(i%5)*.28,5),i%2?'#80b6c0':'#a6d7d7',x,.5,z,1,1,1,a);}
+ add(new T.CylinderGeometry(2.4,2.5,.05,20),'#5b91a2',65.8,.01,-18.2);for(let i=0;i<12;i++)stone('#657d7b',65.8+Math.cos(i)*2.6,.2,-18.2+Math.sin(i)*2.6,.45);
+ // Snow pass: stepped shelves and weathered trail posts, with a narrow readable road.
+ for(let i=0;i<18;i++){const x=77+i*.85,z=-32.5+Math.sin(i*.65)*1.7;stone('#9fabb0',x,1.2,z,1.5,1.1,1.9,.8);stone('#e6ebdc',x,3.2,z,1.2,1.2,.22,.9);}for(let i=0;i<8;i++){box(wood,78+i*1.3,.65,-27.5, .09,1.3,.09);box('#d9c195',78+i*1.3,1.15,-27.5,.65,.12,.05);}
+ // Cinderwash: dark shelves, non-walkable lava cracks at the edge and moving steam.
+ for(let i=0;i<25;i++){const a=i*.8,x=83+Math.cos(a)*(3+i%3),z=-11+Math.sin(a)*3;stone('#69625c',x,.2,z,.7,1.6,.55,.8);box('#dc8a3f',x,.02,z,.8,.02,.11);}
+ for(const [x,z] of [[81,-11],[86,-15],[85,-8]]){const steam=new T.Mesh(new T.SphereGeometry(.4,8,5),new T.MeshBasicMaterial({color:'#c9c6b8',transparent:true,opacity:.22,depthWrite:false}));steam.position.set(x,1,z);steam.userData={x,z};scene.add(steam);animated.push(steam);}
+ // Brasswater's massive buttresses and broken aqueduct silhouette frame the arena.
+ for(let i=0;i<11;i++){const x=92.5+i*.8;box('#9a9f93',x,1.6,-31.1,.76,3.2,.7);box('#d0c4a3',x,3.3,-31.1,.85,.20,.9);if(i%2===0)box('#aaa88f',x,3.7,-31.1,.65,.7,.65);}for(const [x,z] of [[94,-30],[100.5,-29.6],[101,-20],[94,-17.5]]){box('#96998b',x,2.2,z,1.5,4.4,1.5);box('#ccc0a0',x,4.5,z,1.8,.25,1.8);for(const dx of [-.55,.55])box('#a29d87',x+dx,4.85,z,.35,.55,1.6);}
+ for(let i=0;i<7;i++){box('#a6a391',95+i*.9,.04,-24.5, .8,.08,3.0);box('#b39c68',95+i*.9,.085,-24.5,.12,.015,2.7);}
+ for(const [c,parts] of batches){const g=mergeGeometries(parts);parts.forEach(x=>x.dispose());const m=new T.Mesh(g,new T.MeshStandardMaterial({color:c,roughness:.9}));m.castShadow=m.receiveShadow=true;scene.add(m);}
+ // Residents stay near market stalls, with modest clothing and faceless heads.
+ const residents=[];for(let i=0;i<10;i++){const g=new T.Group(),material=new T.MeshStandardMaterial({color:['#6d8f98','#b39468','#987b70'][i%3]});const body=new T.Mesh(new T.ConeGeometry(.24,1.1,7),material);body.position.y=.7;g.add(body);const head=new T.Mesh(new T.SphereGeometry(.15,7,5),new T.MeshStandardMaterial({color:'#3c3933'}));head.position.y=1.35;g.add(head);g.userData={x:46.5+(i%5)*1.65,z:9.6+Math.floor(i/5)*1.3};scene.add(g);residents.push(g);}
+ return {update(time){animated.forEach((s,i)=>{s.position.y=.8+(time*.32+i*.7)%1.8;s.scale.setScalar(.6+s.position.y*.32);s.material.opacity=.3*(1-s.position.y/3);});residents.forEach((r,i)=>{r.position.set(r.userData.x+Math.sin(time*.2+i)*.4,0,r.userData.z+Math.cos(time*.2+i)*.25);r.rotation.y=time*.2+i;});}};
+}

@@ -1,0 +1,2 @@
+import {sqliteTable,text,integer,index} from 'drizzle-orm/sqlite-core';
+export const characters=sqliteTable('characters',{id:text('id').primaryKey(),owner:text('owner').notNull(),name:text('name').notNull(),classId:text('class_id').notNull(),profile:text('profile').notNull(),run:text('run'),revision:integer('revision').notNull().default(0),updated:integer('updated').notNull()},t=>[index('characters_owner').on(t.owner)]);

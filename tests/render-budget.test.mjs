@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import * as T from 'three';
+import {nearbyRenderIds,renderBudget} from '../src/render-budget.js';
+import {buildDarkWorld} from '../src/dark-world.js';
+const loot=Array.from({length:2000},(_,id)=>({id,x:id*100,y:0}));const original=JSON.stringify(loot),player={x:0,y:0};
+assert.equal(nearbyRenderIds(loot,player).size,19);assert.equal(JSON.stringify(loot),original);
+assert(nearbyRenderIds([{id:1,x:2050,y:0}],player,new Map([[1,{}]])).has(1));assert(!nearbyRenderIds([{id:1,x:2300,y:0}],player,new Map([[1,{}]])).has(1));
+assert.equal(renderBudget(true,false).shadowSize,1024);assert.equal(renderBudget(true,false).postprocessing,false);assert.equal(renderBudget(false,false).postprocessing,true);
+const scene=new T.Scene();const t=performance.now();buildDarkWorld(scene);scene.updateMatrixWorld(true);
+const chunks=scene.children.filter(m=>m.name==='scenery-chunk');assert(chunks.length>20);
+const camera=new T.PerspectiveCamera(42,.5,.1,90);camera.position.set(-22,14,23);camera.lookAt(-27.5,0,13.5);camera.updateMatrixWorld();const frustum=new T.Frustum().setFromProjectionMatrix(new T.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
+const total=chunks.reduce((n,m)=>n+m.geometry.attributes.position.count,0),visible=chunks.filter(m=>frustum.intersectsObject(m)).reduce((n,m)=>n+m.geometry.attributes.position.count,0);
+assert(visible<total*.4,'distant scenery is culled');for(const m of chunks)assert(m.geometry.attributes.position.array.every(Number.isFinite));
+console.log('PASS loot render bounds, hysteresis, retained drops, mobile graphics budget; scenery vertices submitted',visible,'of',total,'world build ms',Math.round(performance.now()-t));

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {gameRequest} from '../src/network-request.js';
+import {guardedFrame} from '../src/frame-loop.js';
+const pending={batchId:'same-id',commands:[{op:'step',dt:.016,x:1,y:0}]};let signal;
+await assert.rejects(gameRequest('batch',pending,{timeoutMs:10,fetcher:(_,options)=>{signal=options.signal;return new Promise(()=>{});}}),/timed out/);assert(signal.aborted);assert.equal(pending.batchId,'same-id');
+await assert.rejects(gameRequest('batch',pending,{timeoutMs:10,fetcher:async()=>({ok:true,json:()=>new Promise(()=>{})})}),/timed out/);
+const result=await gameRequest('batch',pending,{fetcher:async(_,options)=>{assert.equal(JSON.parse(options.body).batchId,'same-id');return {ok:true,json:async()=>({revision:2})};}});assert.equal(result.revision,2);
+let failure=0,scheduled=0;const frame=guardedFrame(()=>{throw Error('renderer failure');},()=>failure++,()=>scheduled++);frame(0);frame(1);assert.equal(failure,1);assert.equal(scheduled,0);
+guardedFrame(()=>{},()=>assert.fail(),()=>scheduled++)(0);assert.equal(scheduled,1);
+console.log('PASS stalled fetch/body timeout, pending batch preserved for retry, visible frame-error callback and no crash loop');

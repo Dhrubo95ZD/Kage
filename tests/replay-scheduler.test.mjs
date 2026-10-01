@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import Sim from '../src/js/combat.js';
+import {newProfile} from '../src/js/rpg.js';
+import {applyCommands} from '../src/js/commands.js';
+import {replayWithoutBlocking} from '../src/replay-scheduler.js';
+const s=new Sim().attachProfile(newProfile('replay','Tester','katana')),sync=Sim.restore(s.exportState());
+const queue=Array.from({length:120},()=>({op:'step',dt:1/60,x:.5,y:0}));let ticks=0,yields=0,commits=0;
+await replayWithoutBlocking(s,queue,state=>{commits++;assert.equal(state,s);},{now:()=>ticks++,budget:4,yieldFrame:async()=>{yields++;if(yields===1)queue.push({op:'act',action:'dash'},{op:'step',dt:.02,x:0,y:1});}});
+applyCommands(sync,queue);assert.deepEqual(s.exportState(),sync.exportState());assert.equal(commits,1);assert(yields>10);assert.equal(queue.length,122);
+console.log('PASS save replay yields, preserves new inputs and matches authoritative synchronous state');

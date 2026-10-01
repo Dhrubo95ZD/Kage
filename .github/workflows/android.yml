@@ -1,0 +1,50 @@
+name: Android APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Verify gameplay and build web game
+        run: npm test && npm run build
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Build installable test APK
+        run: gradle -p android --no-daemon :app:assembleDebug :app:lintDebug
+      - name: Package APK and checksum
+        run: |
+          mkdir -p apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk apk/Kage-Shadowfall-test.apk
+          sha256sum apk/Kage-Shadowfall-test.apk > apk/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kage-Android-APK
+          path: apk/*
+          retention-days: 30
+      - name: Publish downloadable test build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "android-test-${GITHUB_RUN_NUMBER}" apk/* --title "Kage Android test build ${GITHUB_RUN_NUMBER}" --prerelease --notes "Installable debug-signed Android launcher for the online game. Android 8+ and an up-to-date browser required. Uses the browser sign-in session and existing cloud characters. This is not an offline or native-engine build. Source commit: ${GITHUB_SHA}. Device playtesting is still required."

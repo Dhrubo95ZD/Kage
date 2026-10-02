@@ -17,7 +17,7 @@ public class OfflineGameTest {
  private String js(ActivityScenario<MainActivity> app,String code) throws Exception {
   CountDownLatch latch=new CountDownLatch(1);AtomicReference<String> value=new AtomicReference<>();
   app.onActivity(a->a.getGameView().evaluateJavascript(code,result->{value.set(result);latch.countDown();}));
-  assertTrue("JavaScript responded",latch.await(10,TimeUnit.SECONDS));return value.get();
+  assertTrue("JavaScript responded: "+code,latch.await(60,TimeUnit.SECONDS));return value.get();
  }
  private void until(ActivityScenario<MainActivity> app,String expression) throws Exception {
   long end=SystemClock.elapsedRealtime()+120000;

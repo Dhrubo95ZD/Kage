@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {createDeviceService,characterExport,parseCharacterExport} from '../src/device-save.js';
+import Sim from '../src/js/combat.js';
+const rows=new Map(),storage={all:async()=>structuredClone([...rows.values()]),get:async id=>structuredClone(rows.get(id)),put:async r=>{rows.set(r.id,structuredClone(r));}};
+const api=createDeviceService(storage);assert.equal((await api('account')).characters.length,0);
+const {profile}=await api('characters',{name:'Seraph',classId:'katana'});const run=await api('run',{id:profile.id}),sim=Sim.restore(run.state);
+sim.profile.gold=456;sim.gold=456;sim.player.x+=100;const state=sim.exportState();await api('save',{state});
+assert.deepEqual((await api('run',{id:profile.id})).state,state);
+const exported=characterExport(sim.profile);assert.deepEqual(parseCharacterExport(exported),sim.profile);
+const imported=await api('import',{text:exported});assert.notEqual(imported.profile.id,profile.id);assert.equal(imported.profile.gold,456);assert.deepEqual(imported.profile.equipment,sim.profile.equipment);assert.equal((await api('account')).characters.length,2);
+assert.throws(()=>parseCharacterExport('{}'));assert.throws(()=>parseCharacterExport(exported.replace('"katana"','"constructor"')));assert.throws(()=>parseCharacterExport(exported.replace('"gold": 456','"gold": -1')));
+await assert.rejects(api('batch',{}),/unavailable offline/);await assert.rejects(api('characters',{name:'a',classId:'bad'}));
+const broken=createDeviceService({...storage,put:async()=>{throw Error('disk full');}});await assert.rejects(broken('save',{state}),/disk full/);assert.deepEqual((await api('run',{id:profile.id})).state,state);
+console.log('PASS device creation, exact run restore, independent imports, equipment transfer, malformed saves and write failure');

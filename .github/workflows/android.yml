@@ -11,7 +11,7 @@ concurrency:
 jobs:
   apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,7 +20,7 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Verify gameplay and build web game
-        run: npm test && npm run build
+        run: npm test && npm run build:android
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -36,12 +36,32 @@ jobs:
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Build installable test APK
         run: gradle -p android --no-daemon :app:assembleDebug :app:lintDebug
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Verify bundled offline gameplay on Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: gradle -p android --no-daemon :app:connectedDebugAndroidTest
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Android-test-reports
+          path: android/app/build/reports/
       - name: Package APK and checksum
         run: |
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose android/app/build/outputs/apk/debug/app-debug.apk
           mkdir -p apk
-          cp android/app/build/outputs/apk/debug/app-debug.apk apk/Kage-Shadowfall-test.apk
-          sha256sum apk/Kage-Shadowfall-test.apk > apk/SHA256SUMS.txt
+          cp android/app/build/outputs/apk/debug/app-debug.apk apk/Kage-Shadowfall-device.apk
+          sha256sum apk/Kage-Shadowfall-device.apk > apk/SHA256SUMS.txt
       - uses: actions/upload-artifact@v4
         with:
           name: Kage-Android-APK
@@ -51,4 +71,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "android-test-${GITHUB_RUN_NUMBER}" apk/* --title "Kage Android test build ${GITHUB_RUN_NUMBER}" --prerelease --notes "Installable debug-signed Android launcher for the online game. Android 8+ and an up-to-date browser required. Uses the browser sign-in session and existing cloud characters. This is not an offline or native-engine build. Source commit: ${GITHUB_SHA}. Device playtesting is still required."
+          gh release create "android-device-${GITHUB_RUN_NUMBER}" apk/* --title "Kage on-device build ${GITHUB_RUN_NUMBER}" --prerelease --notes "Bundled offline Android game. Plays inside the app with no browser launch, sign-in or internet requirement. Uses Android WebView for the existing renderer, not a native-engine port. Device saves stay separate from cloud saves; export your cloud character and import it in the app. Android 8+ with current Android System WebView required. Debug-signed test build. Source commit: ${GITHUB_SHA}. Android emulator smoke test passed; physical-device performance still needs testing."

@@ -1,13 +1,14 @@
 {
   "name": "kage-shadowfall",
   "private": true,
-  "version": "0.22.2",
+  "version": "0.23.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/build-online.mjs",
-    "test": "node tests/combat.test.mjs && node tests/rig.test.mjs && node tests/rpg.test.mjs && node tests/gear-update.test.mjs && node tests/feedback.test.mjs && node tests/skill-tree.test.mjs && node tests/evolutions.test.mjs && node tests/salvage-portals.test.mjs && node tests/tactical-combat.test.mjs && node tests/runtime-recovery.test.mjs && node tests/chest-renderer.test.mjs && node tests/open-world.test.mjs && node tests/render-budget.test.mjs && node tests/replay-scheduler.test.mjs",
+    "test": "node tests/combat.test.mjs && node tests/rig.test.mjs && node tests/rpg.test.mjs && node tests/gear-update.test.mjs && node tests/feedback.test.mjs && node tests/skill-tree.test.mjs && node tests/evolutions.test.mjs && node tests/salvage-portals.test.mjs && node tests/tactical-combat.test.mjs && node tests/runtime-recovery.test.mjs && node tests/chest-renderer.test.mjs && node tests/open-world.test.mjs && node tests/render-budget.test.mjs && node tests/replay-scheduler.test.mjs && node tests/device-save.test.mjs",
     "db:generate": "drizzle-kit generate",
-    "test:legacy-story": "node tests/combat.test.mjs && node tests/rig.test.mjs && node tests/rpg.test.mjs && node tests/gear-update.test.mjs && node tests/story.test.mjs && node tests/feedback.test.mjs && node tests/skill-tree.test.mjs && node tests/evolutions.test.mjs && node tests/chapter-two.test.mjs && node tests/salvage-portals.test.mjs && node tests/hunters.test.mjs && node tests/graphics.test.mjs && node tests/quest-navigation.test.mjs && node tests/tactical-combat.test.mjs && node tests/runtime-recovery.test.mjs && node tests/chest-renderer.test.mjs && node tests/biome-pacing.test.mjs"
+    "test:legacy-story": "node tests/combat.test.mjs && node tests/rig.test.mjs && node tests/rpg.test.mjs && node tests/gear-update.test.mjs && node tests/story.test.mjs && node tests/feedback.test.mjs && node tests/skill-tree.test.mjs && node tests/evolutions.test.mjs && node tests/chapter-two.test.mjs && node tests/salvage-portals.test.mjs && node tests/hunters.test.mjs && node tests/graphics.test.mjs && node tests/quest-navigation.test.mjs && node tests/tactical-combat.test.mjs && node tests/runtime-recovery.test.mjs && node tests/chest-renderer.test.mjs && node tests/biome-pacing.test.mjs",
+    "build:android": "npm run build && node scripts/bundle-android.mjs"
   },
   "devDependencies": {
     "drizzle-kit": "^0.31.11",

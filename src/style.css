@@ -88,3 +88,21 @@
 
 /* Quiet sandbox HUD: no overlapping chapter announcements. */
 #zoneBanner{display:none!important}#objective{max-width:65vw}#objective .quest-copy{font-family:system-ui,sans-serif;font-size:13px;line-height:1.4}.combat-header .vitals{background:linear-gradient(120deg,#141b20e8,#202b2cbb)}.hunter-hero,.hunt-card,.rpg-window{background-color:#141d21}.region-travel-grid article{padding:16px;border:1px solid #475152;border-radius:8px}.world-route-map{filter:saturate(.4)}
+#regionCard{position:absolute;left:50%;top:17%;transform:translateX(-50%);display:grid;justify-items:center;gap:5px;padding:16px 56px 18px;pointer-events:none;opacity:0;z-index:4;text-align:center;color:#fff3d6;background:radial-gradient(ellipse at center,#08121acc 0%,#08121a73 50%,transparent 74%);white-space:nowrap}
+#regionCard.show{animation:regionCard 4.8s ease-out forwards}
+#regionCard small{font:600 11px/1 system-ui,sans-serif;letter-spacing:6px;color:#e9c981}
+#regionCard strong{font:400 40px/1.05 Georgia,'Times New Roman',serif;letter-spacing:2px;text-shadow:0 2px 16px #000d}
+#regionCard strong::before,#regionCard strong::after{content:'';display:inline-block;width:52px;height:1px;background:linear-gradient(90deg,transparent,#e9c981);vertical-align:middle;margin:0 16px}
+#regionCard strong::after{background:linear-gradient(90deg,#e9c981,transparent)}
+#regionCard em{font:italic 15px/1.3 Georgia,serif;color:#eadfc4}
+#regionCard span{font:700 10px/1 system-ui,sans-serif;letter-spacing:3px;color:#cdd8cf;margin-top:3px}
+#regionCard span.dangerous{color:#ffb56b}#regionCard span.deadly{color:#ff7262}
+#regionCard.boss{top:23%}#regionCard.boss strong{color:#ffd9a8;font-size:42px;letter-spacing:5px;text-transform:uppercase}#regionCard.boss small{color:#ff8e6e}
+@keyframes regionCard{0%{opacity:0;transform:translate(-50%,12px) scale(.97)}12%{opacity:1;transform:translate(-50%,0) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-8px)}}
+@media(max-width:650px){#regionCard{top:21%;padding:10px 22px 12px}#regionCard strong,#regionCard.boss strong{font-size:27px}#regionCard strong::before,#regionCard strong::after{width:18px;margin:0 8px}#regionCard em{font-size:13px}}
+@media(prefers-reduced-motion:reduce){#regionCard.show{animation-name:regionCardFade}}
+@keyframes regionCardFade{0%,100%{opacity:0}10%,80%{opacity:1}}
+#bossbar:not([hidden])~#regionCard{top:29%}
+#regionCard.landmark{top:21%}#regionCard.landmark strong{font-size:30px}#regionCard.landmark em{font-size:13px;opacity:.8}#regionCard.landmark span{color:#ffd88a}
+@media(max-width:650px){#regionCard.landmark strong{font-size:22px}}
+@media(max-width:650px){#regionCard{top:25%}#regionCard.landmark{top:27%}#bossbar:not([hidden])~#regionCard{top:33%}}

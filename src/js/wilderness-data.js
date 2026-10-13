@@ -1,13 +1,13 @@
 export const WILDERNESS=[
- {id:'coast',name:'Greyshore',x:-2750,y:1350,level:1,loot:'approach',color:'#555d4e'},
- {id:'forest',name:'Blackpine Woods',x:-1450,y:-650,level:4,loot:'quarry',color:'#36483e'},
- {id:'lowlands',name:'Old Mill Lowlands',x:850,y:400,level:6,loot:'garrison',color:'#65614c'},
- {id:'reservoir',name:'The Drowned Ramparts',x:2650,y:-3100,level:8,loot:'keep',color:'#485457'},
- {id:'saffron',name:'Saffron Frontier',x:4800,y:650,level:10,loot:'terraces',color:'#6b6252'},
- {id:'ravine',name:'Glassroot Ravine',x:6600,y:-1450,level:12,loot:'terraces',color:'#44575b'},
- {id:'snow',name:'Whitewind Highlands',x:8250,y:-2950,level:15,loot:'highlands',color:'#a2aeb3'},
- {id:'cinder',name:'Cinderwash Wastes',x:8850,y:0,level:16,loot:'highlands',color:'#55483e'},
- {id:'fortress',name:'Brasswater Ruins',x:9820,y:-2450,level:19,loot:'fortress',color:'#5b5851'}
+ {id:'coast',name:'Greyshore',x:-2750,y:1350,level:1,loot:'approach',color:'#555d4e',tagline:'Salt wind, harbour bells and the first road east.'},
+ {id:'forest',name:'Blackpine Woods',x:-1450,y:-650,level:4,loot:'quarry',color:'#36483e',tagline:'Old pines that remember every blade.'},
+ {id:'lowlands',name:'Old Mill Lowlands',x:850,y:400,level:6,loot:'garrison',color:'#65614c',tagline:'Wheat, windmills and a river worth defending.'},
+ {id:'reservoir',name:'The Drowned Ramparts',x:2650,y:-3100,level:8,loot:'keep',color:'#485457',tagline:'A fortress the reservoir swallowed whole.'},
+ {id:'saffron',name:'Saffron Frontier',x:4800,y:650,level:10,loot:'terraces',color:'#6b6252',tagline:'Red stone, gold dust and the last caravan camp.'},
+ {id:'ravine',name:'Glassroot Ravine',x:6600,y:-1450,level:12,loot:'terraces',color:'#44575b',tagline:'Crystal sings beneath the cliffs.'},
+ {id:'snow',name:'Whitewind Highlands',x:8250,y:-2950,level:15,loot:'highlands',color:'#a2aeb3',tagline:'Prayer flags snap above the wolf passes.'},
+ {id:'cinder',name:'Cinderwash Wastes',x:8850,y:0,level:16,loot:'highlands',color:'#55483e',tagline:'Ash falls like snow from the burning mountain.'},
+ {id:'fortress',name:'Brasswater Ruins',x:9820,y:-2450,level:19,loot:'fortress',color:'#5b5851',tagline:'The brass giants fell. Their keep did not.'}
 ];
 export function wildernessRegion(x,y){return WILDERNESS.reduce((a,b)=>Math.hypot(x-b.x,y-b.y)<Math.hypot(x-a.x,y-a.y)?b:a);}
 // Continuous weighted field shared by the terrain and biome decoration.

@@ -1,4 +1,5 @@
 import {wildernessRegion} from './wilderness-data.js';
+import {landmarkColliders} from './landmark-data.js';
 import {HUNTS,HUNT_POLYGONS} from './hunt-data.js';
 import {CARAVAN_POLYGONS,CARAVAN_ROOMS,CARAVAN_PATHS,CARAVAN_BUILDINGS,CARAVAN_GROUPS,CARAVAN_CHESTS} from './chapter-two-data.js';
 // Windward Vale: authored land masses, shoreline, loop routes and a gated reservoir.
@@ -45,6 +46,7 @@ for(const [id,name,x,y,guards,gold,heal,upgrade] of [
 LEVEL.polygons.push(...CARAVAN_POLYGONS);LEVEL.rooms.push(...CARAVAN_ROOMS);LEVEL.paths.push(...CARAVAN_PATHS);LEVEL.buildings.push(...CARAVAN_BUILDINGS);LEVEL.groups.push(...CARAVAN_GROUPS);LEVEL.chests.push(...CARAVAN_CHESTS);
 for(const b of LEVEL.buildings)LEVEL.obstacles.push({x:b.x,y:b.y,r:Math.max(b.w,b.d)*.53,kind:'building'});
 for(const [x,y,r,kind] of [[-1350,1400,65,'wagon'],[1180,420,60,'crates'],[-2080,-620,65,'boulder'],[1970,-970,70,'boulder'],[3200,-2860,75,'crates']])LEVEL.obstacles.push({x,y,r,kind});
+for(const o of landmarkColliders())LEVEL.obstacles.push({...o,kind:'landmark'});
 export function insidePolygon(x,y,poly){let inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const [ax,ay]=poly[i],[bx,by]=poly[j];if((ay>y)!==(by>y)&&x<(bx-ax)*(y-ay)/(by-ay)+ax)inside=!inside;}return inside;}
 LEVEL.polygons.push(...HUNT_POLYGONS);
 for(const h of HUNTS){LEVEL.paths.push([[h.entry.x,h.entry.y],...h.stages.map(p=>[p.x,p.y])]);const poly=HUNT_POLYGONS[HUNTS.indexOf(h)];LEVEL.rooms.unshift({id:'hunt-'+h.id,name:h.name,x1:Math.min(...poly.map(p=>p[0])),x2:Math.max(...poly.map(p=>p[0])),y1:Math.min(...poly.map(p=>p[1])),y2:Math.max(...poly.map(p=>p[1]))});}
@@ -67,7 +69,11 @@ for(const road of OVERLAND_ROADS){
  }
  for(const [x,y] of road)LEVEL.polygons.push(Array.from({length:12},(_,i)=>[x+Math.cos(i*Math.PI/6)*300,y+Math.sin(i*Math.PI/6)*300]));
 }
-export function inFloor(x,y,pad=0){const test=(x,y)=>LEVEL.polygons.some(poly=>insidePolygon(x,y,poly));return test(x,y)&&(!pad||[[pad,0],[-pad,0],[0,pad],[0,-pad]].every(([dx,dy])=>test(x+dx,y+dy)));}
+// Exact bounding-box rejection first: identical results, far fewer edge tests in the per-frame movement checks.
+let boxed=[],boxedCount=-1;
+function onFloor(x,y){if(boxedCount!==LEVEL.polygons.length){boxedCount=LEVEL.polygons.length;boxed=LEVEL.polygons.map(poly=>{const xs=poly.map(p=>p[0]),ys=poly.map(p=>p[1]);return [poly,Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)];});}
+ for(const [poly,x1,y1,x2,y2] of boxed)if(x>=x1&&x<=x2&&y>=y1&&y<=y2&&insidePolygon(x,y,poly))return true;return false;}
+export function inFloor(x,y,pad=0){return onFloor(x,y)&&(!pad||[[pad,0],[-pad,0],[0,pad],[0,-pad]].every(([dx,dy])=>onFloor(x+dx,y+dy)));}
 export function areaAt(x,y){return wildernessRegion(x,y).name;}
 function archivedAreaAt(x,y){return [...LEVEL.rooms].reverse().find(r=>x>=r.x1&&x<=r.x2&&y>=r.y1&&y<=r.y2)?.name||'Windward Vale';}
 export function projectToFloor(x,y,pad=18){if(inFloor(x,y,pad))return{x,y};let best={x:LEVEL.start.x,y:LEVEL.start.y,d:Infinity};for(const poly of LEVEL.polygons)for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy),t=Math.max(0,Math.min(1,((x-a[0])*dx+(y-a[1])*dy)/(len*len)));for(const side of [-1,1]){const px=a[0]+dx*t-dy/len*(pad+2)*side,py=a[1]+dy*t+dx/len*(pad+2)*side,d=(x-px)**2+(y-py)**2;if(d<best.d&&inFloor(px,py,pad))best={x:px,y:py,d};}}return best;}

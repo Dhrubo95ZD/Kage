@@ -4,7 +4,13 @@ Mobile-first, online hack-and-slash sandbox RPG. Four classes, skill trees, equi
 
 Play: https://kage-shadowfall.ashd95.chatgpt.site
 
-## Android APK — bundled on-device edition (0.23.0)
+## World design (0.24.0)
+
+The continent no longer floats on a void. Coasts fall to an animated sea with shore foam, lakes fill the reservoir valleys and every inland edge climbs into terraced, forested ridges with snow caps, lava runs and a smoking volcano. Each of the nine regions has its own palette, trees, light, fog, weather and ambient sound, plus a landmark: Seabell Lighthouse and harbour, Willowbend windmills over wheat, the Elder Blackpine and standing stones, Cloudwater Dam above drowned towers, the Sunstone Arch and sea stacks, the Singing Spires, Whitewind Shrine, the Obsidian Teeth and Ember Throne, and Brasswater's fallen colossus, great cog and ring of towers.
+
+Entering a region shows a title card with its enemy level and danger. The first visit to each region and landmark grants exploration XP once per character, and boss fights open with a champion card. The camera rises over ridges, and the hero's silhouette shows through trees. Inside the game this is the same flat, server-replayed combat floor: only the landmark colliders and the discovery rewards touch the shared simulation.
+
+## Android APK — bundled on-device edition (0.24.0)
 
 Download **Kage-Shadowfall-device.apk** from **Releases**. The game, models, sounds and UI are packaged inside the APK. It runs fullscreen in Android’s embedded WebView: **no external browser, no sign-in and no internet required**. This uses the existing Three.js engine; it is not a Unity/native-engine rewrite.
 

@@ -1,6 +1,7 @@
 import Data from './weapons.js';
 import {LEVEL,inFloor} from './level.js';
 import {wildernessRegion,LORE} from './wilderness-data.js';
+import {DISCOVERIES} from './landmark-data.js';
 export function scaleRegionEnemy(e){if(e.openWorldScaled)return;e.openWorldScaled=true;const r=wildernessRegion(e.homeX,e.homeY);e.level=r.level;e.maxHp=Math.round(Data.enemies[e.type].hp*(1+(r.level-1)*.075));e.hp=e.maxHp;e.damageScale=1+(r.level-1)*.095;}
 export function initOpenWorld(sim){
  if(sim.openWorldVersion===1)return;
@@ -30,5 +31,9 @@ export function tickOpenWorld(sim,dt){
   for(const c of sim.chests)if(c.guards===g.id&&!c.id.startsWith('hunt-cache-')){c.opened=false;c.openTime=0;}
  }
  if(sim.player.dead)return;
+ // Exploration pays: each region and landmark grants XP once per character, recorded on the profile.
+ const found=sim.profile.discoveries??=[],here=wildernessRegion(sim.player.x,sim.player.y);
+ if(!found.includes(here.id)){found.push(here.id);const xp=60+here.level*30;sim.xp(xp);sim.emit('discovery',{kind:'region',id:here.id,name:here.name,xp});}
+ for(const d of DISCOVERIES)if(!found.includes(d.id)&&Math.hypot(sim.player.x-d.x,sim.player.y-d.y)<d.r){found.push(d.id);const xp=40+wildernessRegion(d.x,d.y).level*18;sim.xp(xp);sim.emit('discovery',{kind:'landmark',id:d.id,name:d.name,xp});break;}
  sim.loreUntil??={};for(const n of LORE)if(Math.hypot(sim.player.x-n.x,sim.player.y-n.y)<190&&(sim.loreUntil[n.id]||0)<=sim.time){sim.loreUntil[n.id]=sim.time+75;sim.emit('notice',{message:n.name+': '+n.text});break;}
 }

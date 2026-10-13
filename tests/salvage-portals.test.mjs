@@ -34,7 +34,7 @@ const item=(id,level=1,rarity='common')=>makeItem(id,'weapon',level,rarity,'kata
 }
 {
  const s=new Combat().attachProfile(newProfile('p','Tester','katana'));s.enemies=[];
- s.profile.story.stage=6;Object.assign(s.player,{x:4200,y:0,hp:35});
+ s.profile.story.stage=6;s.profile.discoveries=['saffron'];Object.assign(s.player,{x:4200,y:0,hp:35});
  const equipment=structuredClone(s.profile.equipment),copy=Combat.restore(s.exportState());
  const commands=[{op:'step',dt:.02,x:0,y:0}];applyCommands(s,commands);applyCommands(copy,commands);
  assert.deepEqual(s.exportState(),copy.exportState());assert.equal(s.profile.openWorld,true);
